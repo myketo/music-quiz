@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css?family=Shadows+Into+Light" rel="stylesheet"> 
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <title>Which song is that?</title>
+    </head>
+    <body>
+        <div class='result'>
+            <p class='response'></p>
+        </div>
+        <section class='end'>
+            <h1>Thanks for playing!</h1>
+            <h3>Your score: <u><span class='max'>0</span> points.</u></h3>
+            <h3>You guessed: <u><span class='guessed'>0</span>/<span class='all_levels'></span> songs.</u></h3>
+            <h4><a href='index.html'>Play again</a></h4>
+        </section>
+        <header class='top'>
+            <a href='index.html'><h1>Who's song is that?</h1></a>
+        </header>
+
+        <!--<nav class='nav'>
+
+        </nav>-->
+
+        <section class='middle'>
+            <section class='left'>
+                <img src='arrow.png'>
+                <h3>PREVIOUS</h3>  
+            </section>
+
+            <main class='main'>
+                <section class='main_top'>
+                    <section class='score'>
+                        Song: <span class='level'>1</span>/<span class='all_levels'></span><br>
+                        Score: <span class='max'>0</span>
+                    </section>
+                    <audio class='audio'>
+                        <source type='audio/mpeg'>
+                    </audio>
+                    <button class='play'>Play</button>
+                    <p class='time'></p>
+                </section>
+
+                <secion class='options'>
+                    <div class='a'><h3>Been to Hell</h3></div>
+                    <div class='b'><h3>Dead in Ditches</h3></div>
+                    <div class='c'><h3>El Urgencia</h3></div>
+                    <div class='d'><h3>Guzzle, Guzzle</h3></div>
+                    <div class='e'><h3>Tendencies</h3></div>
+                    <div class='f'><h3>The Diary</h3></div>
+                    <div class='g'><h3>The Natives</h3></div>
+                    <div class='h'><h3>Up in Smoke</h3></div>
+                    <div class='i'><h3>Usual Suspects</h3></div>
+                </secion>
+            </main>
+    
+            <section class='right'>
+                <img src='arrow.png'>
+                <h3>NEXT</h3>
+            </section>
+        </section>
+
+
+        <script>
+            var options = [
+                ["Been to Hell", "Hollywood Undead"], 
+                ["Dead in Ditches", "Hollywood Undead"], 
+                ["El Urgencia", "Hollywood Undead"], 
+                ["Guzzle, Guzzle", "Hollywood Undead"],
+                ["Tendencies", "Hollywood Undead"],
+                ["The Diary", "Hollywood Undead"],
+                ["The Natives", "Hollywood Undead"],
+                ["Up in Smoke", "Hollywood Undead"],
+                ["Usual Suspects", "Hollywood Undead"]
+            ];
+
+            var arr = [];
+            for(var j=0; j<9; j++){
+                arr[j] = options[j][0];
+            }
+
+            arr = shuffle(arr);
+            
+            var i=0;
+            var song = options[i][0];
+            var artist = options[i][1];
+
+            $(".all_levels").html(options.length);
+
+            /*var songs = ["Never Too Late", "XIX", "Bottom Feeder", "The Infection", "Stop and Stare", "crushcrushcrush", 
+            "Aerials", "Walking the Wire", "Shape of You"];
+            var artists = ["Three Days Grace", "Slipknot", "Parkway Drive", "Disturbed", "OneRepublic", "Paramore", 
+            "System of a Down", "Imagine Dragons", "Ed Sheeran"];
+            var i=0;
+            var song = songs[i];
+            var artist = artists[i];
+            */
+            $(".audio").attr("src", "audio/"+song+".mp3");
+            var counter = 200;
+            var time = 0;
+            var timer = null;
+            var points = 0;
+            var score = 0;
+            var guessed = 0;
+
+            $(".right").click(function(){
+                var value = parseInt($(".level").text());
+                if((value+1)<=options.length){
+                    i++;
+                    song = options[i][0];
+                    artist = options[i][1];
+                    //var artist = options[i][0];
+                    $(".audio").attr("src", "audio/"+song+".mp3");
+                    clear();
+                    $(".level").html(value+1);
+                    $(".result").css("display", "none");
+                    arr = shuffle(arr);
+                    $("html, body").css("overflow", "initial");
+                }
+
+                if((value+1)==options.length){
+                    $(".right h3").html("FINISH");
+                }
+
+                if((value+1)>options.length){
+                    $(".end").css("display", "flex");
+                }
+            });
+
+            $(".left").click(function(){
+                var value = parseInt($(".level").text());
+                $(".right h3").html("NEXT");
+                if(value>1 || (value-1)>1){
+                    i--;
+                    song = options[i][0];
+                    artist = options[i][1];
+                    //var artist = options[i][0];
+                    $(".audio").attr("src", "audio/"+song+".mp3");
+                    clear();
+                    $(".level").html(value-1);
+                    $(".result").css("display", "none");
+                    arr = shuffle(arr);
+                    $("html, body").css("overflow", "initial");
+                }
+            });
+
+            $("div").click(function(){
+                $('.audio').trigger("pause");
+                $(".play").html("Play");
+                clearInterval(timer);
+                var answer = $(this).text();
+                //console.log(song+" "+artist+"----"+answer);
+
+                if(counter<200 && $(this).css("display") != "block"){
+                    if(answer==song){//artist
+                        var result = "Correct!<br>Title: <u>"+song+"</u>";
+                        $(".result").css({"background-color": "lightgreen", "display": "flex"});
+                        $("html, body").css("overflow", "hidden");
+                        //$("body").css("background-color", "lightgreen");
+                        points += counter;
+                        $('.max').text(points);
+                        guessed += 1;
+                        $(".guessed").text(guessed);
+
+                        score+1;
+                    }else{
+                        var result = "Wrong!<br>Try another song.";
+                        $(".result").css({"background-color": "red", "display": "flex"});
+                        $("html, body").css("overflow", "hidden");
+                        //$("body").css("background-color", "red");
+                        if(points>=100){
+                            points -= 100;
+                        }else{
+                            points-= points;
+                        }
+                        $('.max').text(points);
+                    }
+                    /*var myClass = $(this).attr("class");
+
+                    if(myClass=='a' || myClass=='d' || myClass=='g'){
+                        $(".response").css("margin", "100px 340px");
+                    }else if(myClass=='b' || myClass=='e' || myClass=='h'){
+                        $(".response").css("margin", "100px 340px");
+                    }else{
+                        $(".response").css("margin", "100px 340px");
+                    }*/
+
+                    $(".response").html(result);
+                    /*$(this).css("position", "relative");*/
+                }
+            });
+
+            function count(){
+                --counter;
+                ++time;
+                if(time<10){
+                    var result = "00:0"+time;
+                }else if(time<60){
+                    var result = "00:"+time;
+                }else if(time>=60 && time<70){
+                    var result = "01:0"+(time-60);
+                }else if(time>60){
+                    var result = "01:"+(time-60);
+                }else if(time>=120 && time<130){
+                    var result = "02:0"+(time-120);
+                }else if(time>120){
+                    var result = "02:0"+(time-120);
+                }
+                $(".time").html(result);
+            }
+
+            function clear(){
+                clearInterval(timer);
+                $(".audio").trigger("pause");
+                $(".play").html("Play");
+                $(".time").html("");
+                counter = 200;
+                time = 0;
+            }
+
+            $(".play").click(function(){
+                if( $(".audio").prop("paused") ){
+                    $('.audio').trigger("play");
+                    $(".play").html("Pause");
+                    $(".audio").prop("volume", "0.2");
+                    timer = setInterval("count()", 1000);
+                    console.log(artist+" "+song);
+                }else{
+                    $('.audio').trigger("pause");
+                    $(".play").html("Play");
+
+                    clearInterval(timer);
+                }
+            });
+
+
+
+            function shuffle(array) {
+                var currentIndex = array.length, temporaryValue, randomIndex;
+
+                // While there remain elements to shuffle...
+                while (0 !== currentIndex) {
+
+                    // Pick a remaining element...
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+
+                    // And swap it with the current element.
+                    temporaryValue = array[currentIndex];
+                    array[currentIndex] = array[randomIndex];
+                    array[randomIndex] = temporaryValue;
+                }
+
+                for(var j=0; j<9; j++){
+                    $("div h3").eq(j).html(array[j]);
+                }
+
+                return array;
+            }
+        </script>
+    </body>
+</html>
